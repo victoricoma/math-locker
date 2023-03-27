@@ -1,11 +1,12 @@
-#include <IRremote.h>
+#include <IRremote.hpp>
 
 int RECV_PIN = 11;    
 int pinoledvermelho = 5;  
 int pinoledverde = 7;
 float eq[2][3];
 String leitura="";
-long x=0, y=0, a=0, b=0;
+long x=0, y=0, a=0, b=0, n1=0, n2=0;
+bool f=false;
 
 void setup()  
 {  
@@ -16,71 +17,87 @@ void setup()
   randomSeed(analogRead(0));
 }
 //Função 1: para leitura dos numeros IR
-int lerNumeros(){
-  int saida=0;
+void lerNumeros(){
   if(IrReceiver.decode()){
     auto dado= IrReceiver.decodedIRData.decodedRawData;
-      switch(dado){
-        case 4077698816:
+    Serial.println(dado);
+    if(f==false){
+      f=true;
+      Serial.println("Aperte *!");
+      delay(1000);
+      Serial.println("Gerando Equação...");
+    }
+    delay(500);
+    switch(dado){
+        case 3860463360:
         leitura+= "0";
-        Serial.println(leitura);
         break;
-        case 4010852096:
+        case 3125149440:
         leitura+="1";
-        Serial.println(leitura);
         break;
-        case 3994140416:
+        case 3108437760:
         leitura+="2";
-        Serial.println(leitura);
         break;
-        case 3977428736:
+        case 3091726080:
         leitura+="3";
-        Serial.print(leitura);
         break;
-        case 3944005376:
+        case 3141861120:
         leitura+="4";
-        Serial.println(leitura);
         break;
-        case 3927293696:
+        case 3208707840:
         leitura+="5";
-        Serial.println(leitura);
         break;
-        case 3910582016:
+        case 3158572800:
         leitura+="6";
-        Serial.println(leitura);
         break;
-        case 3877158656:
+        case 4161273600:
         leitura+="7";
-        Serial.println(leitura);
         break;
-        case 3860446976 :
+        case 3927310080 :
         leitura+="8";
-        Serial.println(leitura);
         break;
-        case 3843735296:
+        case 4127850240:
         leitura+="9";
+        case 3810328320:
+        Serial.print("Digitou: ");
         Serial.println(leitura);
-        case 4194680576:
-        saida = converteNumero(leitura);
+        Serial.println("X << ou >> Y");
+        break;
+        case 4144561920:
+        Serial.print("Adicionado >> x= ");
+        x=converteNumero(leitura);
+        Serial.println(x);
         leitura="";
+        break;
+        case 2774204160:
+        Serial.print("Adicionado >> y= ");
+        y=converteNumero(leitura);
+        Serial.println(y);
+        leitura="";
+        break;
+        case 4061003520:
+        n1=random(1,10);
+        n2=random(1,10);
+        faseUm(n1, n2);
+        Serial.println("[OK] X e Y");
+        Serial.println("[UP] Resposta");
+        break;
+        case 3877175040:
+        resolveEquacao();
+      if(x==eq[0][1] && y==eq[0][0]){
+        Serial.println("Acertou Miseravel");
+      }else{
+        Serial.println("Errouuuuuu!");
+      }
         break;
     }
     IrReceiver.resume();
+    delay(500);
   }
-  delay(500);
-  return saida;
 }
 //Função 2: de converter em numero
 int converteNumero(String teclado){
   return teclado.toInt();
-}
-//Função 3: Irá ler os números da Matriz
-void lerMatriz(float numero){
-  for(int i=0; i<2; i++){
-    for(int j=0; j<3; j++){
-      eq[i][j]=numero;
-    }
-  }
 }
 //Função 4: Irá exibir a Matriz da Equacao
 void exibirMatriz(){
@@ -118,5 +135,5 @@ void faseUm(long x, long y){
   exibirMatriz();
 }
 void loop(){
-  
+  lerNumeros();
 }
