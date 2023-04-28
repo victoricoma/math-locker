@@ -1,6 +1,8 @@
 #include <LiquidCrystal.h>
 #include <IRremote.h>
+#include <Servo.h>
 
+Servo tranca_6;
 int RECV_PIN = 11;
 float eq[2][3];
 float teste = 523.56325;
@@ -23,6 +25,7 @@ void lerNumeros() {
     auto dado = IrReceiver.decodedIRData.decodedRawData;
     Serial.println(dado);
     if (f == false) {
+      tranca_6.write(0);
       f = true;
       n1 = random(1, 10);
       n2 = random(1, 10);
@@ -85,6 +88,7 @@ void lerNumeros() {
         delay(1500);
         if (y == eq[0][1] && x == eq[0][0]) {
           exibirLcd("Acertou", "Miseravel!!");
+          tranca_6.write(90);
         } else {
           exibirLcd("Errouuu...", "Errourude!!");
         }
